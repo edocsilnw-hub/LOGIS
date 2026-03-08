@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AFR AI Control - V14.0</title>
+    <style>
+        body { background: #1a1a1a; color: #e0e0e0; font-family: 'Consolas', monospace; padding: 20px; margin: 0; }
+        #chat { border: 1px solid #444; height: 350px; overflow-y: scroll; padding: 10px; background: #000; margin-bottom: 10px; }
+        textarea { width: 100%; height: 60px; background: #222; color: #fff; border: 1px solid #555; resize: none; }
+        
+        /* TWO-COLUMN DASHBOARD */
+        .dashboard-top { display: flex; gap: 20px; background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 10px; align-items: stretch; }
+        .col-left { flex: 1; min-width: 300px; }
+        .col-right { flex: 1; border-left: 1px solid #444; padding-left: 20px; min-width: 300px; }
+
+        #scriptSelect { 
+            width: 100%; 
+            height: 140px; 
+            max-width: 500px; /* Prevents stretching from long paths */
+            background: #111; 
+            color: #0f0; 
+            font-size: 11px;
+        }
+        
+        .controls { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        button { padding: 8px 15px; cursor: pointer; border: none; font-weight: bold; border-radius: 4px; }
+        #sendBtn { background: #007bff; color: white; flex-grow: 1; }
+        #saveBtn { background: #28a745; color: white; }
+        #status { font-style: italic; color: #aaa; margin: 5px 0; font-size: 12px; }
+        select { background: #333; color: #fff; border: 1px solid #555; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>AFR AI INTERFACE <small style="font-size: 12px; color: #888;">VERSION 14.0</small></h1>
+
+    <div class="dashboard-top">
+        <div class="col-left">
+            <label><b>Session:</b></label><br>
+            <select id="sessionSelect" style="width:100%; margin-bottom:10px;">
+                <option value="browser_dev">browser_dev</option>
+                <option value="unity_main">unity_main</option>
+                <option value="physics_test">physics_test</option>
+                <option value="ui_rework">ui_rework</option>
+            </select>
+            
+            <label><b>Project Chunk (Hierarchy/Logs):</b></label><br>
+            <div style="display: flex; gap: 5px;">
+                <select id="chunkSelect" style="flex-grow: 1;"></select>
+                <button onclick="applyChunk()">Apply</button>
+            </div>
+            
+            <div class="controls">
+                <button onclick="createSession()">➕ NEW</button>
+                <button onclick="loadSession()">📂 LOAD</button>
+                <button id="saveBtn" onclick="triggerSave()">💾 SAVE</button>
+            </div>
+        </div>
+
+        <div class="col-right">
+            <label><b>Project Scripts:</b></label>
+            <select id="scriptSelect" multiple size="8"></select>
+            <div style="margin-top:5px; display: flex; justify-content: space-between; align-items: center;">
+                <label>
+                    <input type="checkbox" id="summaryMode" checked>
+                    Summary Mode (Recommended)
+                </label>
+                <button onclick="loadSelectedScripts()">Sync Scripts</button>
+            </div>
+            <p id="modeStatus" style="font-size: 11px; color: #888; margin-top: 5px;">
+                Using Summary Mode (Memory Safe)
+            </p>
+        </div>
+    </div>
+
+    <div id="chat"></div>
+    <p id="status">Ready</p>
+    <textarea id="prompt" placeholder="Ask your assistant anything..."></textarea>
+    <div class="controls">
+        <button id="sendBtn" onclick="sendPrompt()">SEND PROMPT (CTRL+ENTER)</button>
+    </div>
+
+    <script>
+        // Rest of the JS remains the same as your V13.8 
+        // to maintain the established connection logic.
+        async function sendPrompt() {
+            const status = document.getElementById('status');
+            const prompt = document.getElementById('prompt').value;
+            const sessionId = document.getElementById('sessionSelect').value;
+            const chat = document.getElementById('chat');
+
+            status.innerText = "Syncing scripts...";
+
+            chat.innerHTML += `<p style="color: #007bff;"><b>YOU:</b> ${prompt}</p>`;
+            status.innerText = "AI is thinking...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt, session_id: sessionId })
+                });
+    
+                const text = await response.text();
+                const data = JSON.parse(text);
+
+                // FIXED: Check if 'response' exists before displaying it
+                if (data.response !== undefined) {
+                    chat.innerHTML += `<p style="color: #28a745;"><b>AI:</b> <pre style="white-space: pre-wrap;">${data.response}</pre></p>`;
+                } 
+                else if (data.error) {
+                    chat.innerHTML += `<p style="color: #ff4444;"><b>API ERROR:</b> ${data.error}</p>`;
+                } 
+                else {
+                    chat.innerHTML += `<p style="color: #ff4444;"><b>SYSTEM ERROR:</b> Malformed response from Logis.</p>`;
+                }
+
+                status.innerText = "Ready";
+                chat.scrollTop = chat.scrollHeight;
+                document.getElementById('prompt').value = "";
+        } catch (e) {
+            status.innerText = "Error connecting to API";
+            chat.innerHTML += `<p style="color: #ff4444;"><b>CONNECTION ERROR:</b> Check if ai_api.py is running.</p>`;
+        }
+        }
+
+        async function loadSelectedScripts(showAlert = true) {
+            const sessionId = document.getElementById('sessionSelect').value;
+            const selectedScripts = Array.from(document.getElementById("scriptSelect").selectedOptions).map(option => option.value);
+            const summaryMode = document.getElementById("summaryMode").checked;
+            const modeStatus = document.getElementById("modeStatus");
+
+            // FULL MODE WARNING
+            if (!summaryMode) {
+                if (selectedScripts.length > 2) {
+                    alert("Full mode allows maximum 2 scripts to prevent context overflow.");
+                    return;
+            }
+
+            const confirmFull = confirm("⚠ Full Script Injection can overflow AI context and cause instability.\n\nContinue?");
+            if (!confirmFull) return;
+
+            modeStatus.innerText = "⚠ Full Mode Active (High Context Usage)";
+            modeStatus.style.color = "#ff4444";
+        } else {
+            modeStatus.innerText = "Using Summary Mode (Memory Safe)";
+            modeStatus.style.color = "#888";
+        }
+
+        const response = await fetch("http://127.0.0.1:5000/load_scripts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                session_id: sessionId,
+                selected_scripts: selectedScripts,
+                script_mode: summaryMode ? "summary" : "full"
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.status === "Success" && showAlert) {
+            alert("Synced " + result.loaded.length + " scripts (" + result.mode + " mode).");
+        }
+    }
+
+        async function loadChunks() {
+            const response = await fetch("http://127.0.0.1:5000/list_chunks");
+            const text = await response.text();
+            const data = JSON.parse(text);
+            const dropdown = document.getElementById("chunkSelect");
+            dropdown.innerHTML = '<option value="">-- Select Chunk --</option>';
+            data.chunks.forEach(chunk => {
+                const option = document.createElement("option");
+                option.value = chunk;
+                option.textContent = chunk;
+                dropdown.appendChild(option);
+            });
+        }
+
+        async function loadScripts() {
+            const response = await fetch("http://127.0.0.1:5000/list_scripts");
+            const text = await response.text();
+            const data = JSON.parse(text);
+            const dropdown = document.getElementById("scriptSelect");
+            data.scripts.forEach(script => {
+                const option = document.createElement("option");
+                option.value = script;
+                option.textContent = script;
+                dropdown.appendChild(option);
+            });
+        }
+
+        async function applyChunk() {
+            const sessionId = document.getElementById('sessionSelect').value;
+            const chunkName = document.getElementById('chunkSelect').value;
+            await fetch("http://127.0.0.1:5000/set_chunk", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ session_id: sessionId, chunk_name: chunkName })
+            });
+            alert(chunkName ? "Active: " + chunkName : "Brainstorm Mode");
+        }
+
+        async function triggerSave() {
+            const sessionId = document.getElementById('sessionSelect').value;
+            const response = await fetch('http://127.0.0.1:5000/end_session', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ session_id: sessionId })
+            });
+            const result = await response.json();
+            document.getElementById('status').innerText = result.status === "Success" ? "✅ Saved" : "❌ Save Failed";
+        }
+
+        async function createSession() {
+            const name = prompt("Session Name:");
+            if (!name) return;
+            const response = await fetch('http://127.0.0.1:5000/create_session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: name })
+            });
+            if ((await response.json()).status === "Success") location.reload();
+        }
+
+        async function loadSession() {
+            const sessionId = document.getElementById('sessionSelect').value;
+            const response = await fetch('http://127.0.0.1:5000/load_session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: sessionId })
+            });
+            const result = await response.json();
+            if (result.status === "Success") {
+                document.getElementById('chat').innerHTML = `<pre style="color:#ccc;">${result.content}</pre>`;
+            }
+        }
+
+        window.onload = () => { loadChunks(); loadScripts(); };
+    </script>
+</body>
+</html>
