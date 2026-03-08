@@ -97,7 +97,9 @@ def summarize_script_content(script_name, content):
 
 def index_codebase():
     registry = {}
+    vector_map = {}
     logging.info("[INDEXER] Mapping codebase into vector memory...")
+    os.makedirs(VECTORS_DIR, exist_ok=True)
     for root, dirs, files in os.walk(PROJECT_ROOT):
         if any(x in root for x in ["venv", "__pycache__", ".git", "logs", "vectors", "data"]):
             continue
@@ -110,6 +112,7 @@ def index_codebase():
             safe_name = rel_path.replace("\\", "_").replace("/", "_")
             vector_check = os.path.join(VECTORS_DIR, f"{safe_name}_chunk_0.npy")
 
+            needs_index = False
             if not os.path.exists(vector_check):
                 needs_index = True
             else:
@@ -131,6 +134,9 @@ def index_codebase():
 
                         vec = get_embedding(chunk)
 
+                        if vec is None:
+                            continue
+
                         vector_name = f"{safe_name}_chunk_{i}.npy"
                         vector_path = os.path.join(VECTORS_DIR, vector_name)
 
@@ -141,10 +147,30 @@ def index_codebase():
                             "vector_file": vector_name
                         })
 
+                        vector_map[vector_name] = {
+                            "vector_file": vector_name,
+                            "script": rel_path,
+                            "file_name": file,
+                            "chunk_index": i
+                        }
+
                     logging.info(f"[INDEXER] Vectorized: {file} ({len(chunks)} chunks)")
 
                 except Exception as e:
                     logging.error(f"[INDEXER] Failed on {file}: {e}")
+
+    # Save vector registry so context_retriever can find indexed files
+    registry_path = os.path.join(VECTORS_DIR, "vector_registry.json")
+    with open(registry_path, "w", encoding="utf-8") as f:
+        json.dump(registry, f, indent=2)
+    logging.info(f"[INDEXER] Vector registry saved with {len(registry)} scripts.")
+
+    # Save vector map so VectorIndex can map vectors back to source files
+    map_path = os.path.join(VECTORS_DIR, "vector_map.json")
+    with open(map_path, "w", encoding="utf-8") as f:
+        json.dump(vector_map, f, indent=2)
+    logging.info("[INDEXER] Vector map saved.")
+
 def save_dependency_map(dep_map):
     path = os.path.join(VECTORS_DIR, "dependency_map.json")
     try:
