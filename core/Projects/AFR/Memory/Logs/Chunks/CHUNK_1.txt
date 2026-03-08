@@ -1,0 +1,187 @@
+--- LOGIS PROGRESS TRACKER | CHUNK 1 ---
+
+[2026-03-06 16:22:04]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, Write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics."
+
+[2026-03-06 16:22:04]
+ROLE: AI
+TYPE: response
+CONTENT:
+[MODEL ERROR] HTTPConnectionPool(host='127.0.0.1', port=11434): Max retries exceeded with url: /api/generate (Caused by NewConnectionError("HTTPConnection(host='127.0.0.1', port=11434): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+
+==================================================
+
+[2026-03-06 16:26:40]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, Write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics.
+
+[2026-03-06 16:26:40]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 16:30:42]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, Write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics.
+
+[2026-03-06 16:30:42]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 16:36:11]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, Write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics.
+
+[2026-03-06 16:36:11]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 17:01:24]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics.
+
+[2026-03-06 17:01:24]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 17:41:20]
+ROLE: USER
+TYPE: code
+CONTENT:
+Logis, write a NitroBoost.cs script. It needs to detect a 'Left Shift' input, consume a 'boost amount' variable, and apply a Force to the Rigidbody of the car. Make sure it's compatible with our existing vehicle physics.
+
+[2026-03-06 17:41:20]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 17:48:31]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 17:48:31]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 18:01:09]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:01:09]
+ROLE: AI
+TYPE: response
+CONTENT:
+
+
+==================================================
+
+[2026-03-06 18:28:51]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:28:51]
+ROLE: AI
+TYPE: response
+CONTENT:
+[Model returned empty response]
+
+==================================================
+
+[2026-03-06 18:30:04]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:30:04]
+ROLE: AI
+TYPE: response
+CONTENT:
+[Model returned empty response]
+
+==================================================
+
+[2026-03-06 18:32:57]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:32:57]
+ROLE: AI
+TYPE: response
+CONTENT:
+[Model returned empty response]
+
+==================================================
+
+[2026-03-06 18:35:02]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:35:02]
+ROLE: AI
+TYPE: response
+CONTENT:
+[Model returned empty response]
+
+==================================================
+
+[2026-03-06 18:41:20]
+ROLE: USER
+TYPE: development
+CONTENT:
+test
+
+[2026-03-06 18:41:20]
+ROLE: AI
+TYPE: response
+CONTENT:
+Welcome to the brainstorming and coding session for "A Friendly Rally." I'm LOGIS, your Senior System Architect and Lead Developer. Since we're starting from scratch, let's establish a context for our project.
+
+From your initial request, I understand that we're looking to develop a game with the core concept of a friendly rally. Before we dive into mechanics and coding, I'd like to clarify the project's overall direction. Could you please provide some insight into what you have in mind for this game? What type of gameplay, themes, or features do you envision?
+
+Once we have a better understanding of the project's scope, we can begin discussing systemic design and brainstorming ideas for mechanics.
+
+==================================================
