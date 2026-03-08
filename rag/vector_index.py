@@ -10,6 +10,7 @@ class VectorIndex:
         self.vectors = []
         self.metadata = []
         self.vector_map = self.load_vector_map()
+        self.load_vectors()
 
     def load_vector_map(self):
         map_path = os.path.join(self.vector_dir, "vector_map.json")
@@ -40,7 +41,14 @@ class VectorIndex:
                     except:
                         continue
 
+    def reload(self):
+        """Reload vector map and vectors from disk (call after re-indexing)."""
+        self.vector_map = self.load_vector_map()
+        self.load_vectors()
+
     def search(self, query_vector, top_k=5):
+        if len(self.vectors) == 0:
+            self.reload()
         if len(self.vectors) == 0:
             return []
 
